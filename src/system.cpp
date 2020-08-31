@@ -56,3 +56,7 @@ void CHIP8::initialise(){
     }
 
 }
+
+void CHIP8::emulateCycle(){
+
+}

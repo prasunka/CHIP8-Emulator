@@ -1,3 +1,4 @@
+#include <string>
 
 class CHIP8
 {
@@ -17,6 +18,13 @@ public:
      * Clear the memory and initialise CPU variables.
      */
     void initialise();
+
+    /**
+     * Load the program into memory.
+     *
+     * @param filename The path to the ROM to load
+     */
+    void loadROM(const std::string& filename);
     /**
      * Emulate one cycle of the CPU.
      */
