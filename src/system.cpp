@@ -75,8 +75,9 @@ bool CHIP8::loadROM(const std::string &filename){
     int length = in.tellg();
     in.seekg (0, in.beg);
 
-    std::cerr << "\nProgram loaded: " << filename
-              << "\nSize          : " << length << std::endl;
+    std::cerr << "\nProgram loaded : " << filename
+              << "\nSize(bytes)    : " << length
+              << "\n" << std::endl;
 
     char *buffer = new char[length];
 
