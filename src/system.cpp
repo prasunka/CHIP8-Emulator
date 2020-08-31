@@ -1,3 +1,6 @@
+#include <iostream>
+#include <fstream>
+
 #include "system.h"
 
 unsigned char CHIP8Fontset[80] =
@@ -55,6 +58,42 @@ void CHIP8::initialise(){
         memory[i] = CHIP8Fontset[i];
     }
 
+}
+
+bool CHIP8::loadROM(const std::string &filename){
+    std::ifstream in;
+    std::cerr << "Loading program: " << filename << std::endl;
+    in.open(filename, std::ios::in | std::ios::binary);
+
+    if(!in.is_open()){
+        std::cerr << "Program couldn't be opened!" << std::endl;
+        return false;
+    }
+
+    // get length of file:
+    in.seekg (0, in.end);
+    int length = in.tellg();
+    in.seekg (0, in.beg);
+
+    std::cerr << "\nProgram loaded: " << filename
+              << "\nSize          : " << length << std::endl;
+
+    char *buffer = new char[length];
+
+    in.read(buffer, length);
+
+    if (length < 4096 - 512){
+        for (int i = 0; i < length; ++i){
+            memory[512 + i] = buffer[i];
+        }
+    }
+    else{
+        std::cerr << "Program too big to fit in memory!" << std::endl;
+        in.close();
+        return false;
+    }
+
+    return true;
 }
 
 void CHIP8::emulateCycle(){

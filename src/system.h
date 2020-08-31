@@ -22,9 +22,10 @@ public:
     /**
      * Load the program into memory.
      *
+     * @return True if program is loaded successfully, false otherwise.
      * @param filename The path to the ROM to load
      */
-    void loadROM(const std::string& filename);
+    bool loadROM(const std::string& filename);
     /**
      * Emulate one cycle of the CPU.
      */
