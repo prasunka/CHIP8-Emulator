@@ -5,7 +5,14 @@
 
 int main(int argc, char** argv){
 
-    std::cout << "Testing!" << std::endl;
+    CHIP8 emulator;
+
+    emulator.initialise();
+
+    while(true){
+        emulator.emulateCycle();
+        std::cout << "Running cycle!" << std::endl;
+    }
 
     return 0;
 }
