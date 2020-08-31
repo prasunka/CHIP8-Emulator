@@ -2,12 +2,29 @@
 class CHIP8
 {
 public:
+
+    /**
+     * Empty default constructor
+     */
     CHIP8();
+    /**
+     * Empty default destructor
+     */
     ~CHIP8();
 
+    /**
+     * Initialise the system
+     * Clear the memory and initialise CPU variables.
+     */
     void initialise();
+    /**
+     * Emulate one cycle of the CPU.
+     */
     void emulateCycle();
 
+    /**
+     * Graphics screen with 64 * 32 pixels.
+     */
     unsigned char graphics[64 * 32];
 
 private:
