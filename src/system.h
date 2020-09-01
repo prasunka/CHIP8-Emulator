@@ -32,9 +32,13 @@ public:
     void emulateCycle();
 
     /**
-     * Graphics screen with 64 * 32 pixels.
+     * Graphics screen with 32 * 64 pixels.
      */
-    unsigned char graphics[64 * 32];
+    unsigned char graphics[32 * 64];
+
+    unsigned char key[16];
+
+    bool drawFlag;
 
 private:
     unsigned short opcode;
@@ -44,7 +48,6 @@ private:
     unsigned short sp;
 
     unsigned char R[16];
-    unsigned char key[16];
     unsigned char memory[4096];
     unsigned char delayTimer;
     unsigned char soundTimer;
