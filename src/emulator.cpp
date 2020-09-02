@@ -13,7 +13,7 @@
 #define GRAPHICS_HEIGHT  32
 #define GRAPHICS_WIDTH   64
 
-#define CLOCK_DELAYER 900
+#define CLOCK_DELAYER   0
 #define TOTAL_KEYS     16
 
 unsigned char SDLKeys[TOTAL_KEYS] = {
@@ -91,9 +91,11 @@ int main(int argc, char** argv){
     unsigned int pixels[GRAPHICS_HEIGHT * GRAPHICS_WIDTH];
     int timer = 0;
     long start = SDL_GetTicks();
+    long start_per_frame = SDL_GetTicks();
     long countedFrames = 0;
 
     while(true){
+
         SDL_Event event;
 
         while(SDL_PollEvent(&event)) {
@@ -150,13 +152,17 @@ int main(int argc, char** argv){
             // }
 
 
-            //SDL_RenderClear(renderer);
+            SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer,texture,NULL,NULL);
             SDL_RenderPresent(renderer);
 
 
             emulator.drawFlag = false;
 
+            if((1000 / 60) > (SDL_GetTicks() - start_per_frame)){
+                SDL_Delay( (1000 / 60) - (SDL_GetTicks() - start_per_frame));
+            }
+            start_per_frame = SDL_GetTicks();
             float avgFPS = countedFrames / ( (SDL_GetTicks() - start) / 1000.f );
 			if( avgFPS > 2000000 ){
 				avgFPS = 0;
