@@ -1,5 +1,6 @@
 #include <iostream>
 #include <stdint.h>
+#include <cstring>
 #include <string>
 
 #include "SDL2/SDL.h"
@@ -89,6 +90,8 @@ int main(int argc, char** argv){
 
     unsigned int pixels[GRAPHICS_HEIGHT * GRAPHICS_WIDTH];
     int timer = 0;
+    long start = SDL_GetTicks();
+    long countedFrames = 0;
 
     while(true){
         SDL_Event event;
@@ -125,25 +128,45 @@ int main(int argc, char** argv){
         else {
             timer += 1;
         }
+
+
+        int pitch;
+        void* m_pixels;
+
+
         if (emulator.drawFlag){
+            SDL_RenderClear(renderer);
+            if(SDL_LockTexture(texture, NULL, (void **)&m_pixels, &pitch) < 0){
+                std::cerr << "Couldn't lock texture!\n" << SDL_GetError() << std::endl;
+            }
             for (int i = 0; i < (GRAPHICS_HEIGHT * GRAPHICS_WIDTH); ++i){
                 pixels[i] = ((0x00FFFFFF *  emulator.graphics[i]) | 0xFF000000);
             }
+            memcpy(m_pixels, pixels, GRAPHICS_HEIGHT*pitch);
+            SDL_UnlockTexture(texture);
+            // if (SDL_UpdateTexture(texture, NULL, pixels, GRAPHICS_WIDTH * sizeof(unsigned int)) < 0){
+            //     std::cerr << "Couldn't update texture!\n" << SDL_GetError() << std::endl;
+            //     exit(1);
+            // }
 
-            if (SDL_UpdateTexture(texture, NULL, pixels, GRAPHICS_WIDTH * sizeof(unsigned int)) < 0){
-                std::cerr << "Couldn't update texture!\n" << SDL_GetError() << std::endl;
-                exit(1);
-            }
 
-            SDL_RenderClear(renderer);
+            //SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer,texture,NULL,NULL);
             SDL_RenderPresent(renderer);
 
-            emulator.drawFlag = false;
-        }
 
+            emulator.drawFlag = false;
+
+            float avgFPS = countedFrames / ( (SDL_GetTicks() - start) / 1000.f );
+			if( avgFPS > 2000000 ){
+				avgFPS = 0;
+			}
+            ++countedFrames;
+
+            std::cerr << "Avg. FPS: " << avgFPS << "\r";
+        }
         if (emulator.beepFlag){
-            std::cerr << "Beep!!" << std::endl;
+            //std::cerr << "Beep!!" << std::endl;
             //TODO
 
             emulator.beepFlag = false;
