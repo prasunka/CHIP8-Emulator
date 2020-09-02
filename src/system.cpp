@@ -1,6 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <ctime>
+#include <chrono>
+#include <thread>
 #include "system.h"
 
 unsigned char CHIP8Fontset[80] =
@@ -103,7 +105,6 @@ bool CHIP8::loadROM(const std::string &filename){
 void CHIP8::emulateCycle(){
 
     opcode = memory[pc] << 8 | memory[pc + 1];
-                    std::cout << std::hex << opcode << std::dec<< std::endl;
 
 
     switch (opcode & 0xF000){
@@ -111,7 +112,7 @@ void CHIP8::emulateCycle(){
         case 0x0000: // 0XYZ
             switch (opcode & 0x00FF) {
                 case 0x00E0: // 00E0
-                     for (int i = 0; i < 64 * 32; ++i){
+                    for (int i = 0; i < 64 * 32; ++i){
                         graphics[i] = 0;
                     }
                     drawFlag = true;
@@ -121,7 +122,6 @@ void CHIP8::emulateCycle(){
                 case 0x00EE: //00EE
                     --sp;
                     pc = stack[sp];
-                    stack[sp] = 0;
                     pc += 2;
                     break;
 
@@ -183,64 +183,64 @@ void CHIP8::emulateCycle(){
         case 0x8000:
             switch (opcode & 0x000F){
                 case 0x0000:
-                    R[opcode & 0x0F00 >> 8] = R[opcode & 0x00F0 >> 4];
+                    R[(opcode & 0x0F00) >> 8] = R[(opcode & 0x00F0) >> 4];
                     pc += 2;
                     break;
 
                 case 0x0001:
-                    R[opcode & 0x0F00 >> 8] |= R[opcode & 0x00F0 >> 4];
+                    R[(opcode & 0x0F00) >> 8] |= R[(opcode & 0x00F0) >> 4];
                     pc += 2;
                     break;
 
                 case 0x0002:
-                    R[opcode & 0x0F00 >> 8] &= R[opcode & 0x00F0 >> 4];
+                    R[(opcode & 0x0F00) >> 8] &= R[(opcode & 0x00F0) >> 4];
                     pc += 2;
                     break;
 
                 case 0x0003:
-                    R[opcode & 0x0F00 >> 8] ^= R[opcode & 0x00F0 >> 4];
+                    R[(opcode & 0x0F00) >> 8] ^= R[(opcode & 0x00F0) >> 4];
                     pc += 2;
                     break;
 
                 case 0x0004:
-                    if (R[opcode & 0x0F00 >> 8] > (0xFF - R[opcode & 0x00F0 >> 4]))
+                    R[(opcode & 0x0F00) >> 8] += R[(opcode & 0x00F0) >> 4];
+                    if (R[(opcode & 0x0F00) >> 8] > (0xFF - R[(opcode & 0x00F0) >> 4]))
                         R[0xF] = 1;
                     else
                         R[0xF] = 0;
 
-                    R[opcode & 0x0F00 >> 8] += R[opcode & 0x00F0 >> 4];
                     pc += 2;
                     break;
 
                 case 0x0005:
-                    if (R[opcode & 0x0F00 >> 8] > (R[opcode & 0x00F0 >> 4]))
+                    if (R[(opcode & 0x0F00) >> 8] > (R[(opcode & 0x00F0) >> 4]))
                         R[0xF] = 1;
                     else
                         R[0xF] = 0;
 
-                    R[opcode & 0x0F00 >> 8] -= R[opcode & 0x00F0 >> 4];
+                    R[(opcode & 0x0F00) >> 8] -= R[(opcode & 0x00F0) >> 4];
                     pc += 2;
                     break;
 
                 case 0x0006:
-                    R[0xF] = R[opcode & 0x0F00 >> 8] & 0x0001;
-                    R[opcode & 0x0F00 >> 8] = R[opcode & 0x0F00 >> 8] >> 1;
+                    R[0xF] = R[(opcode & 0x0F00) >> 8] & 0x0001;
+                    R[(opcode & 0x0F00) >> 8] = R[(opcode & 0x0F00) >> 8] >> 1;
                     pc += 2;
                     break;
 
                 case 0x0007:
-                    if (R[opcode & 0x0F00 >> 8] < (R[opcode & 0x00F0 >> 4]))
+                    if (R[(opcode & 0x0F00) >> 8] > (R[(opcode & 0x00F0) >> 4]))
                         R[0xF] = 1;
                     else
                         R[0xF] = 0;
 
-                    R[opcode & 0x0F00 >> 8] = R[opcode & 0x00F0 >> 4] - R[opcode & 0x0F00 >> 8];
+                    R[(opcode & 0x0F00) >> 8] = R[(opcode & 0x00F0) >> 4] - R[(opcode & 0x0F00) >> 8];
                     pc += 2;
                     break;
 
                 case 0x000E:
-                    R[0xF] = R[opcode & 0x0F00 >> 8] & 0x8000;
-                    R[opcode & 0x0F00 >> 8] = R[opcode & 0x0F00 >> 8] << 1;
+                    R[0xF] = R[(opcode & 0x0F00) >> 8] >> 7;
+                    R[(opcode & 0x0F00) >> 8] = R[(opcode & 0x0F00) >> 8] << 1;
                     pc += 2;
                     break;
 
@@ -252,7 +252,7 @@ void CHIP8::emulateCycle(){
 
         case 0x9000:
             if (opcode & 0x000F == 0){
-                if (R[opcode & 0x0F00 >> 8] != R[opcode & 0x00F0 >> 4])
+                if (R[(opcode & 0x0F00) >> 8] != R[(opcode & 0x00F0) >> 4])
                     pc += 4;
                 else
                     pc += 2;
@@ -290,13 +290,11 @@ void CHIP8::emulateCycle(){
                 pixel = memory[I + row];
                 for(unsigned short column = 0; column < 8; ++column){
                     if ((pixel & (0x0080 >> column)) != 0){
-                        unsigned short posPixel = ((x + column) % 64) + (((y + row) % 32) * 64);
+                        unsigned short posPixel = ((x + column)%64) + (((y + row)%32) * 64);
                         if(graphics[posPixel] == 1){
                             R[0xF] = 1;
                         }
-                        else{
-                            R[0xF] = 0;
-                        }
+
 
                         graphics[posPixel] ^= 1;
                     }
@@ -310,6 +308,7 @@ void CHIP8::emulateCycle(){
 
         case 0xE000:
             if ((opcode & 0x00FF) == 0x009E){
+
                 if (key[R[(opcode & 0x0F00) >> 8]] != 0)
                     pc += 4;
                 else
@@ -317,6 +316,7 @@ void CHIP8::emulateCycle(){
                 break;
             }
             else if ((opcode & 0x00FF) == 0x00A1){
+
                 if (key[R[(opcode & 0x0F00) >> 8]] == 0)
                     pc += 4;
                 else
@@ -379,14 +379,14 @@ void CHIP8::emulateCycle(){
                     break;
 
                 case 0x0055:
-                    for (int i = 0; i < 16; ++i){
+                    for (int i = 0; i <= ((opcode & 0x0F00) >> 8); ++i){
                         memory[I + i] = R[i];
                     }
                     pc += 2;
                     break;
 
                 case 0x0065:
-                    for (int i = 0; i < 16; ++i){
+                    for (int i = 0; i <= ((opcode & 0x0F00) >> 8); ++i){
                         R[i] = memory[I + i];
                     }
                     pc += 2;
@@ -405,6 +405,7 @@ void CHIP8::emulateCycle(){
     }
 
     if(delayTimer > 0){
+
         --delayTimer;
     }
 
