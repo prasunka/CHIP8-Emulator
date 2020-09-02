@@ -16,6 +16,7 @@
 #define CLOCK_DELAYER   0
 #define TOTAL_KEYS     16
 
+#define FPS_CAP        60
 unsigned char SDLKeys[TOTAL_KEYS] = {
     SDLK_x,
     SDLK_1,
@@ -159,8 +160,8 @@ int main(int argc, char** argv){
 
             emulator.drawFlag = false;
 
-            if((1000 / 60) > (SDL_GetTicks() - start_per_frame)){
-                SDL_Delay( (1000 / 60) - (SDL_GetTicks() - start_per_frame));
+            if((1000 / FPS_CAP) > (SDL_GetTicks() - start_per_frame)){
+                SDL_Delay( (1000 / FPS_CAP) - (SDL_GetTicks() - start_per_frame));
             }
             start_per_frame = SDL_GetTicks();
             float avgFPS = countedFrames / ( (SDL_GetTicks() - start) / 1000.f );
