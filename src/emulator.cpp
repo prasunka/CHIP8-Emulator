@@ -1,14 +1,21 @@
 #include <iostream>
 #include <stdint.h>
-#include <chrono>
-#include <thread>
 #include <string>
 
 #include "SDL2/SDL.h"
 
 #include "system.h"
 
-unsigned char SDLKeys[16] = {
+#define WINDOW_HEIGHT  768
+#define WINDOW_WIDTH  1024
+
+#define GRAPHICS_HEIGHT  32
+#define GRAPHICS_WIDTH   64
+
+#define CLOCK_DELAYER 900
+#define TOTAL_KEYS     16
+
+unsigned char SDLKeys[TOTAL_KEYS] = {
     SDLK_x,
     SDLK_1,
     SDLK_2,
@@ -39,6 +46,10 @@ int main(int argc, char** argv){
 
     emulator.initialise();
 
+    if (!emulator.loadROM(argv[1])){
+        exit(1);
+    }
+
     SDL_Window   *window   = NULL;
     SDL_Renderer *renderer = NULL;
     SDL_Texture  *texture  = NULL;
@@ -48,13 +59,10 @@ int main(int argc, char** argv){
         exit(1);
     }
 
-    int windowHeight =  768;
-    int windowWidth  = 1024;
-
     window = SDL_CreateWindow("CHIP8-Emulator",
                 SDL_WINDOWPOS_UNDEFINED,
                 SDL_WINDOWPOS_UNDEFINED,
-                windowWidth, windowHeight,
+                WINDOW_WIDTH, WINDOW_HEIGHT,
                 SDL_WINDOW_RESIZABLE);
 
     if (window == NULL){
@@ -64,22 +72,23 @@ int main(int argc, char** argv){
 
     renderer = SDL_CreateRenderer(window, -1, 0);
 
+    if (renderer == NULL){
+        std::cerr << "Couldn't create Renderer!\n" << SDL_GetError() << std::endl;
+        exit(1);
+    }
+
     texture = SDL_CreateTexture(renderer,
                     SDL_PIXELFORMAT_ARGB8888,
                     SDL_TEXTUREACCESS_STREAMING,
-                    64, 32);
+                    GRAPHICS_WIDTH, GRAPHICS_HEIGHT);
 
     if(texture == NULL){
         std::cerr << "Couldn't create texture!\n" << SDL_GetError() << std::endl;
         exit(1);
     }
 
+    unsigned int pixels[GRAPHICS_HEIGHT * GRAPHICS_WIDTH];
     int timer = 0;
-    uint32_t pixels[32 * 64];
-
-    if (!emulator.loadROM(argv[1])){
-        exit(1);
-    }
 
     while(true){
         SDL_Event event;
@@ -92,7 +101,7 @@ int main(int argc, char** argv){
                 if (event.key.keysym.sym == SDLK_ESCAPE)
                     exit(0);
 
-                for (int i = 0; i < 16; ++i){
+                for (int i = 0; i < TOTAL_KEYS; ++i){
                     if (event.key.keysym.sym == SDLKeys[i]){
                         emulator.key[i] = 1;
                     }
@@ -100,7 +109,7 @@ int main(int argc, char** argv){
             }
 
             if (event.type == SDL_KEYUP){
-                for (int i = 0; i < 16; ++i){
+                for (int i = 0; i < TOTAL_KEYS; ++i){
                     if (event.key.keysym.sym == SDLKeys[i]){
                         emulator.key[i] = 0;
                     }
@@ -108,7 +117,7 @@ int main(int argc, char** argv){
             }
         }
 
-        if (timer == 900){
+        if (timer == CLOCK_DELAYER){
             emulator.emulateCycle();
             timer = 0;
         }
@@ -116,14 +125,12 @@ int main(int argc, char** argv){
         else {
             timer += 1;
         }
-        if(emulator.drawFlag){
-            for (int i = 0; i < (32 * 64); ++i){
-                uint8_t pixel = emulator.graphics[i];
-                pixels[i] = ((0x00FFFFFF * pixel) | 0xFF000000);
-
+        if (emulator.drawFlag){
+            for (int i = 0; i < (GRAPHICS_HEIGHT * GRAPHICS_WIDTH); ++i){
+                pixels[i] = ((0x00FFFFFF *  emulator.graphics[i]) | 0xFF000000);
             }
 
-            if (SDL_UpdateTexture(texture, NULL, pixels, 64 * sizeof(Uint32)) < 0){
+            if (SDL_UpdateTexture(texture, NULL, pixels, GRAPHICS_WIDTH * sizeof(unsigned int)) < 0){
                 std::cerr << "Couldn't update texture!\n" << SDL_GetError() << std::endl;
                 exit(1);
             }
@@ -135,6 +142,12 @@ int main(int argc, char** argv){
             emulator.drawFlag = false;
         }
 
+        if (emulator.beepFlag){
+            std::cerr << "Beep!!" << std::endl;
+            //TODO
+
+            emulator.beepFlag = false;
+        }
 
     }
 

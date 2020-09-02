@@ -3,6 +3,7 @@
 #include <ctime>
 #include <chrono>
 #include <thread>
+
 #include "system.h"
 
 unsigned char CHIP8Fontset[80] =
@@ -120,7 +121,7 @@ void CHIP8::emulateCycle(){
                     break;
 
                 case 0x00EE: //00EE
-                    --sp;
+                    sp -= 1;
                     pc = stack[sp];
                     pc += 2;
                     break;
@@ -137,22 +138,26 @@ void CHIP8::emulateCycle(){
 
         case 0x2000:
             stack[sp] = pc;
-            ++sp;
             pc = (opcode & 0x0FFF);
+            sp += 1;
             break;
 
         case 0x3000:
             if (R[(opcode & 0x0F00) >> 8] == (opcode & 0x00FF)){
                 pc += 4;
             }
-            else pc += 2;
+            else {
+                pc += 2;
+            }
             break;
 
         case 0x4000:
             if (R[(opcode & 0x0F00) >> 8] != (opcode & 0x00FF)){
                 pc += 4;
             }
-            else pc += 2;
+            else {
+                pc += 2;
+            }
             break;
 
         case 0x5000:
@@ -161,7 +166,9 @@ void CHIP8::emulateCycle(){
                     pc += 4;
                 }
 
-                else pc += 2;
+                else {
+                    pc += 2;
+                }
                 break;
             }
             else {
@@ -251,7 +258,7 @@ void CHIP8::emulateCycle(){
             break;
 
         case 0x9000:
-            if (opcode & 0x000F == 0){
+            if ((opcode & 0x000F)== 0x0){
                 if (R[(opcode & 0x0F00) >> 8] != R[(opcode & 0x00F0) >> 4])
                     pc += 4;
                 else
@@ -410,6 +417,9 @@ void CHIP8::emulateCycle(){
     }
 
     if(soundTimer > 0){
+        if (soundTimer == 1){
+            beepFlag = true;
+        }
         --soundTimer;
     }
 

@@ -39,6 +39,7 @@ public:
     unsigned char key[16];
 
     bool drawFlag;
+    bool beepFlag;
 
 private:
     unsigned short opcode;
