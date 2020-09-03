@@ -68,6 +68,8 @@ To make it more usable on modern keyboards, it has been mapped to the following 
 * Add sound support.
 * Render FPS value directly to the window.
 
+## License:
+This project is available under the [MIT License](https://github.com/prasunka/CHIP8-Emulator/blob/master/LICENSE)
 ## References
 [*CHIP-8 Wiki*](https://en.wikipedia.org/wiki/CHIP-8)
 
