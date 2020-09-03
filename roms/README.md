@@ -24,7 +24,7 @@ The controls for the games were not available with the ROMs so I am adding the o
 ### PONG & PONG2
 
 | Control |      Effect in game     |
-|: ------- | -----------------------:|
+|:------- | -----------------------:|
 |    1    | Left player move up     |
 |    q    | Left player move down   |
 |    4    | Right player move up    |
