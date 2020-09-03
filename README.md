@@ -44,6 +44,8 @@ make
 ```
 ./emulator <ROM file path>
 ```
+
+See [roms](https://github.com/prasunka/CHIP8-Emulator/tree/master/roms) directory for some public domain programs.
 ## Input
 
 The original 16-key keypad layout looked like this:
