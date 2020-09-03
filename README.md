@@ -44,6 +44,29 @@ make
 ```
 ./emulator <ROM file path>
 ```
+## Input:
+
+The original 16-key keypad layout looked like this:
+| 1     |   2   |   3   |   C   |
+|   -   |   -   |   -   |   -   |
+|**4**  |**5**  |**6**  |**D**  |
+|**7**  |**8**  |**9**  |**E**  |
+|**A**  |**0**  |**B**  |**F**  |
+
+
+To make it more usable on modern keyboards, it has been mapped to the following layout:
+
+| 1     |   2   |   3   |   4   |
+|   -   |   -   |   -   |   -   |
+|**Q**  |**W**  |**E**  |**R**  |
+|**A**  |**S**  |**D**  |**F**  |
+|**Z**  |**X**  |**C**  |**V**  |
+
+
+## TODO:
+
+* Add sound support.
+* Render FPS value directly to the window.
 
 ## References
 [*CHIP-8 Wiki*](https://en.wikipedia.org/wiki/CHIP-8)
