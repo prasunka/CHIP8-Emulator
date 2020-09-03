@@ -90,9 +90,9 @@ int main(int argc, char** argv){
     }
 
     unsigned int pixels[GRAPHICS_HEIGHT * GRAPHICS_WIDTH];
-    int timer = 0;
-    long start = SDL_GetTicks();
-    long start_per_frame = SDL_GetTicks();
+    int  timer = 0;
+    long start = SDL_GetTicks(); // For measuring average FPS
+    long start_per_frame = SDL_GetTicks(); // For capping FPS
     long countedFrames = 0;
 
     while(true){
@@ -138,20 +138,17 @@ int main(int argc, char** argv){
 
 
         if (emulator.drawFlag){
-            SDL_RenderClear(renderer);
+
             if(SDL_LockTexture(texture, NULL, (void **)&m_pixels, &pitch) < 0){
                 std::cerr << "Couldn't lock texture!\n" << SDL_GetError() << std::endl;
             }
+
             for (int i = 0; i < (GRAPHICS_HEIGHT * GRAPHICS_WIDTH); ++i){
                 pixels[i] = ((0x00FFFFFF *  emulator.graphics[i]) | 0xFF000000);
             }
+
             memcpy(m_pixels, pixels, GRAPHICS_HEIGHT*pitch);
             SDL_UnlockTexture(texture);
-            // if (SDL_UpdateTexture(texture, NULL, pixels, GRAPHICS_WIDTH * sizeof(unsigned int)) < 0){
-            //     std::cerr << "Couldn't update texture!\n" << SDL_GetError() << std::endl;
-            //     exit(1);
-            // }
-
 
             SDL_RenderClear(renderer);
             SDL_RenderCopy(renderer,texture,NULL,NULL);
