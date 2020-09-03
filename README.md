@@ -8,7 +8,7 @@ A CHIP-8 emulator written in C++ and providing graphics with SDL2 library.
 ![BRICKS](screenshots/brick.png "BRICKS")
 *Bricks*
 
-![TICTAC](screenshots/brick.png "TICTAC")
+![TICTAC](screenshots/tictac.png "TICTAC")
 *Tic-Tac-Toe*
 
 ## What is CHIP-8?
