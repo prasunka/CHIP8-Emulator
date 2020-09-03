@@ -173,7 +173,7 @@ int main(int argc, char** argv){
             std::cerr << "Avg. FPS: " << avgFPS << "\r";
         }
         if (emulator.beepFlag){
-            //std::cerr << "Beep!!" << std::endl;
+            std::cerr << "Beep!!                    \r" << std::endl;
             //TODO
 
             emulator.beepFlag = false;
