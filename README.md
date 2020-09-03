@@ -62,6 +62,8 @@ To make it more usable on modern keyboards, it has been mapped to the following 
 | **A** | **S** | **D** | **F** |
 | **Z** | **X** | **C** | **V** |
 
+See the [README](https://github.com/prasunka/CHIP8-Emulator/blob/master/roms/README.md) in `roms` directory for tested controls.
+
 
 ## TODO:
 
